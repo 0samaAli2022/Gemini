@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import appSetup from './utils/appSetup.js';
 import appIndex from './hooks/index.hooks.js';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const app = express();
 const port = process.env.port || 3000;

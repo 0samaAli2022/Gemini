@@ -1,13 +1,13 @@
-import bcrypt from "bcrypt";
-import asyncHandler from "express-async-handler";
+import bcrypt from 'bcrypt';
+import asyncHandler from 'express-async-handler';
 const hashPassword = asyncHandler(async (password) => {
   const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
+  const hashedPassword = bcrypt.hash(password, salt);
   return hashedPassword;
 });
 
-const comparePassword = asyncHandler(async (password, hashedPassword) => {
-  return await bcrypt.compare(password, hashedPassword);
+const comparePassword = asyncHandler((password, hashedPassword) => {
+  return bcrypt.compare(password, hashedPassword);
 });
 
 export { hashPassword, comparePassword };

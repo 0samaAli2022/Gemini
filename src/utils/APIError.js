@@ -3,13 +3,15 @@ class APIError extends Error {
     super(message);
     this.statusCode = statusCode;
     this.statusText =
-      statusCode == 401
-        ? "unauthorized"
+      statusCode == 400
+        ? 'Bad Request'
+        : statusCode == 401
+        ? 'Unauthorized'
         : statusCode == 403
-        ? "forbidden"
+        ? 'Forbidden'
         : statusCode == 404
-        ? "not found"
-        : "Internal Server Error.";
+        ? 'Not found'
+        : 'Internal Server Error.';
   }
 }
 

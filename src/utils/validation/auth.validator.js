@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { check } from 'express-validator';
-import { validationMiddleware } from '../../middlewares/validation.middleware.js';
+import { validationMiddleware } from '../../middleware/validation.middleware.js';
+
 const prisma = new PrismaClient();
 const registerValidator = [
   check('name')
@@ -21,11 +22,21 @@ const registerValidator = [
       });
       if (exists) throw new Error('Another user is using this email.');
     }),
+    // a third party service to check if the email really exists (25 searches per month free plan)
+    // .custom(async (value) => {
+    //   const response = await fetch(
+    //     `https://api.hunter.io/v2/email-verifier?email=${value}&api_key=${process.env.HUNTER_API_KEY}`
+    //   );
+    //   const data = await response.json();
+    //   console.log(data);
+    //   if (data.data.status === 'invalid')
+    //     throw new Error('Please Enter a valid Email.');
+    // }),
   check('password')
     .isLength({
       min: 8,
     })
-    .withMessage('password should be at least 8 characters')
+    .withMessage('Password should be at least 8 characters.')
     .isLength({
       max: 22,
     })
@@ -45,9 +56,9 @@ const loginValidator = [
           email: value,
         },
       });
-      if (!exists) throw new Error('wrong email or password.');
+      if (!exists) throw new Error('Wrong email or password.');
     }),
-  check('password').notEmpty().withMessage('password is required'),
+  check('password').notEmpty().withMessage('Password is required'),
   validationMiddleware,
 ];
 
@@ -56,7 +67,7 @@ const changePasswordValidator = [
     .isLength({
       min: 8,
     })
-    .withMessage('password should be at least 8 characters')
+    .withMessage('Password should be at least 8 characters')
     .isLength({
       max: 22,
     })
@@ -75,7 +86,7 @@ const forgotPasswordValidator = [
           email: value,
         },
       });
-      if (!exists) throw new Error('no user is using this email.');
+      if (!exists) throw new Error('No user is using this email.');
     }),
   validationMiddleware,
 ];
@@ -92,13 +103,13 @@ const resetPasswordValidator = [
           email: value,
         },
       });
-      if (!exists) throw new Error('no user is using this email.');
+      if (!exists) throw new Error('No user is using this email.');
     }),
   check('password')
     .isLength({
       min: 8,
     })
-    .withMessage('password should be at least 8 characters')
+    .withMessage('Password should be at least 8 characters')
     .isLength({
       max: 22,
     })
@@ -111,9 +122,9 @@ const verifyResetPasswordValidator = [
     .notEmpty()
     .withMessage('Token is required')
     .isLength({ min: 128 })
-    .withMessage('invalid token')
+    .withMessage('Invalid token')
     .isLength({ max: 128 })
-    .withMessage('invalid token'),
+    .withMessage('Invalid token'),
   validationMiddleware,
 ];
 
