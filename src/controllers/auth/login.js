@@ -9,6 +9,7 @@ import APIError from '../../utils/APIError.js';
 import asyncHandler from 'express-async-handler';
 import { sendEmailToUser } from '../../config/Nodemailer/nodemailer.js';
 import { redisClient } from '../../config/Redis/redisClient.js';
+import cloudinary from 'cloudinary';
 
 const prisma = new PrismaClient();
 
@@ -70,14 +71,30 @@ const login = asyncHandler(async (req, res, next) => {
   const refreshToken = await createRefreshToken(user.id);
 
   await redisClient.set(refreshToken, user.id, {
-    EX: 90 * 24 * 60 * 60, // Set the expiration time to 90 days
+    EX: process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60, // Set the expiration time to 90 days
   });
-
-  res.cookie('refreshToken', refreshToken, {
-    maxAge: 90 * 24 * 60 * 60 * 1000,
+  const cookieOptions = {
+    maxAge: process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
     httpOnly: true,
-  });
-  res.status(200).json({ user, token: accessToken });
+  };
+  if (process.env.NODE_ENV === 'prod') cookieOptions.secure = true;
+  res.cookie('refreshToken', refreshToken, cookieOptions);
+  // Remove password and tokens from output
+  const propertiesToHide = [
+    'password',
+    'passwordChangedAt',
+    'passwordResetToken',
+    'passwordResetTokenExpire',
+    'passwordResetTokenVerified',
+    'emailVerificationToken',
+    'createdAt',
+    'updatedAt',
+  ];
+  propertiesToHide.forEach((property) => (user[property] = undefined));
+  user.photo = cloudinary.v2.url(user.photo);
+  res
+    .status(200)
+    .json({ status: 'success', data: { user, token: accessToken } });
 });
 
 export { login };

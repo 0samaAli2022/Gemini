@@ -9,7 +9,7 @@ import {
   verifyResetPassword,
   resetPassword,
   changePassword,
-} from '../controllers/Auth/auth.index.js';
+} from '../controllers/auth/auth.index.js';
 import {
   forgotPasswordValidator,
   resetPasswordValidator,

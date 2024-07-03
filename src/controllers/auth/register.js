@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import APIError from '../../utils/APIError.js';
 import asyncHandler from 'express-async-handler';
 import { sendEmailToUser } from '../../config/Nodemailer/nodemailer.js';
+import uuid4 from 'uuid4';
 
 const prisma = new PrismaClient();
 
@@ -19,6 +20,7 @@ const register = asyncHandler(async (req, res, next) => {
   const hashedPassword = await hashPassword(password);
   const user = await prisma.user.create({
     data: {
+      id: uuid4(),
       name,
       email,
       password: hashedPassword,
@@ -56,6 +58,19 @@ const register = asyncHandler(async (req, res, next) => {
                       <p>If you did not verfiy your account you won't be able to use a lot of website features</p>`,
   };
   await sendEmailToUser(info);
+
+  // Remove password and tokens from output
+  const propertiesToHide = [
+    'password',
+    'passwordChangedAt',
+    'passwordResetToken',
+    'passwordResetTokenExpire',
+    'passwordResetTokenVerified',
+    'emailVerificationToken',
+    'createdAt',
+    'updatedAt',
+  ];
+  propertiesToHide.forEach((property) => (user[property] = undefined));
   res.status(200).json({ status: 'Success', data: user });
 });
 

@@ -8,20 +8,34 @@ datasource db {
 }
 
 model User {
-  id                        Int              @id @default(autoincrement())
-  name                      String
-  email                     String           @unique
-  password                  String
-  role                      Role             @default(USER)
-  isActive                  Boolean          @default(true)
-  createdAt                 DateTime         @default(now())
-  updatedAt                 DateTime         @updatedAt
-  passwordResetToken        String?
-  passwordResetTokenVerfied Boolean?
-  passwordResetTokenExpire  String?
-  passwordChangedAt         String?
-  emailVerificationToken    String?          @unique
-  emailVerified             Boolean          @default(false)
+  id                         String    @id @db.Uuid
+  name                       String
+  email                      String    @unique
+  password                   String
+  role                       Role      @default(USER)
+  photo                      String    @default("users/default_user")
+  isActive                   Boolean   @default(true)
+  createdAt                  DateTime  @default(now())
+  updatedAt                  DateTime  @updatedAt
+  passwordResetToken         String?
+  passwordResetTokenVerified Boolean?
+  passwordResetTokenExpire   String?
+  passwordChangedAt          String?
+  emailVerificationToken     String?   @unique
+  emailVerified              Boolean   @default(false)
+  Profile                    Profile[]
+
+  @@map("users")
+}
+
+model Profile {
+  id      String @id @db.Uuid
+  user_id String @db.Uuid
+  photo   String
+  bio     String
+  user    User   @relation(fields: [user_id], references: [id])
+
+  @@map("profiles")
 }
 
 enum Role {

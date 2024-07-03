@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 const authMiddleware = asyncHandler(async (req, res, next) => {
   const token = req.headers['authorization'];
-  if (!token) return next(new APIError('Header not found', 400));
+  if (!token) return next(new APIError('Authorization header not found', 400));
   const encodedToken = token.split(' ')[1];
   if (!encodedToken) return next(new APIError('Token not found', 403));
   const decodedToken = await verifyAccessToken(encodedToken);
@@ -20,7 +20,10 @@ const isAdmin = asyncHandler(async (req, res, next) => {
   const user = req.user;
   if (!user) return next();
   const role = user.role;
-  if (role !== 'ADMIN') return next(new APIError('You are not admin.', 403));
+  if (role !== 'ADMIN')
+    return next(
+      new APIError('You are not authorized to access this route.', 403)
+    );
   next();
 });
 

@@ -12,6 +12,8 @@ class APIError extends Error {
         : statusCode == 404
         ? 'Not found'
         : 'Internal Server Error.';
+    this.isOperational = true;
+    Error.captureStackTrace(this, this.constructor);
   }
 }
 

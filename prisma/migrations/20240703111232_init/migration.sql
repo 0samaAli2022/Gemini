@@ -3,7 +3,7 @@ CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN');
 
 -- CreateTable
 CREATE TABLE "User" (
-    "id" SERIAL NOT NULL,
+    "id" UUID NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE "User" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "passwordResetToken" TEXT,
-    "passwordResetTokenVerfied" BOOLEAN,
+    "passwordResetTokenVerified" BOOLEAN,
     "passwordResetTokenExpire" TEXT,
     "passwordChangedAt" TEXT,
     "emailVerificationToken" TEXT,
