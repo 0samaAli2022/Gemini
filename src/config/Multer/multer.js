@@ -25,15 +25,13 @@ const resizeUserPhoto = async (req, res, next) => {
   next();
 };
 
-const uploadSinglePhoto = multer({
+const upload = multer({
   storage,
   limits: { fileSize: 30 * 1024 * 1024 },
   fileFilter,
-}).single('image');
+});
 
-const uploadMultiPhotos = multer({
-  storage,
-  limits: { fileSize: 30 * 1024 * 1024 },
-}).array('image');
+const uploadSinglePhoto = upload.single('image');
+const uploadMultiPhotos = upload.array('images', 5);
 
 export { uploadMultiPhotos, uploadSinglePhoto, resizeUserPhoto };
