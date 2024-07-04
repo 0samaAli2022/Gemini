@@ -7,11 +7,11 @@ cloudinary.config({
   api_secret: process.env.CLOUD_API_SECRET,
 });
 
-const uploadImage = asyncHandler(async (imageBuffer, filename) => {
+const uploadImage = asyncHandler(async (imageBuffer, filename, foldername) => {
   // Use the uploaded file's name as the asset's public ID and
   // allow overwriting the asset with new versions
   const options = {
-    folder: 'users',
+    folder: foldername,
     use_filename: true,
     unique_filename: false,
     overwrite: true,
@@ -28,15 +28,24 @@ const uploadImage = asyncHandler(async (imageBuffer, filename) => {
   return uploadResult;
 });
 
-const upload = asyncHandler(async (req, res, next) => {
+const uploadPhotoCloudinary = asyncHandler(async (req, res, next) => {
   if (!req.file) return next();
   if (req.user.photo !== 'users/default_user') {
     await cloudinary.v2.uploader.destroy(req.user.photo);
   }
-  const result = await uploadImage(req.file.buffer, req.file.filename);
+  const result = await uploadImage(req.file.buffer, req.file.filename, 'users');
   console.log(result);
   req.file.filename = result.public_id;
   next();
 });
 
-export { upload };
+const uploadPhotosCloudinary = asyncHandler(async (req, res, next) => {
+  if (!req.files) return next();
+  for (let i = 0; i < req.files.length; i++) {
+    const result = await uploadImage(req.files[i].buffer, req.files[i].filename, 'posts');
+    req.files[i].filename = result.public_id;
+  }
+  next();
+});
+
+export { uploadPhotoCloudinary, uploadPhotosCloudinary };

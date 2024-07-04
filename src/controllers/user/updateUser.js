@@ -42,4 +42,7 @@ const updateUser = asyncHandler(async (req, res, next) => {
   res.status(200).json({ status: 'Success', data: user });
 });
 
-export { updateUser };
+const test = asyncHandler(async (req, res, next) => {
+  res.status(200).json({ status: 'Success', data: 'test' });
+})
+export { updateUser, test };
