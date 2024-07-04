@@ -17,7 +17,7 @@ const fileFilter = (req, file, cb) => {
 const resizeUserPhoto = async (req, res, next) => {
   if (!req.file) return next();
   req.file.filename = `user-${req.user.id}-${Date.now()}`;
-  await sharp(req.file.buffer)
+  req.file.buffer = await sharp(req.file.buffer)
     .resize(500, 500)
     .toFormat('jpg')
     .jpeg({ quality: 90 })
