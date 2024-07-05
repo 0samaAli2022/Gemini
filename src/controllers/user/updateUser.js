@@ -5,27 +5,42 @@ import cloudinary from 'cloudinary';
 const prisma = new PrismaClient();
 
 const updateUser = asyncHandler(async (req, res, next) => {
-  const { name, role, isActive } = req.body;
-  const dataToUpdate = {};
-  if (req.file) {
-    dataToUpdate.photo = req.file.filename;
-  }
-  if (name !== undefined) {
-    dataToUpdate.name = name;
-  }
-  if (role !== undefined) {
-    dataToUpdate.role = role;
-  }
-  if (isActive !== undefined) {
-    dataToUpdate.isActive = isActive;
-  }
+  const { name, role, isActive, bio } = req.body;
+  const user = await prisma.user.findUnique({
+    where: {
+      id: req.user.id,
+    },
+    include: {
+      profile: true,
+    },
+  });
+  const dataToUpdate = {
+    name: name || user.name,
+    role: role || user.role,
+    isActive: isActive || user.isActive,
+    profile: {
+      update: {
+        photo: req.file ? req.file.filename : user.profile.photo,
+        bio: bio || user.profile.bio,
+      },
+    },
+  };
 
-  const user = await prisma.user.update({
+  const updatedUser = await prisma.user.update({
     where: {
       id: req.user.id,
     },
     data: dataToUpdate,
+    include: {
+      profile: {
+        select: {
+          photo: true,
+          bio: true,
+        },
+      },
+    },
   });
+
   const propertiesToHide = [
     'password',
     'passwordChangedAt',
@@ -36,13 +51,12 @@ const updateUser = asyncHandler(async (req, res, next) => {
     'createdAt',
     'updatedAt',
   ];
-  propertiesToHide.forEach((property) => (user[property] = undefined));
-  user.photo = cloudinary.v2.url(req.file.filename);
-  console.log(user.photo);
-  res.status(200).json({ status: 'Success', data: user });
+  propertiesToHide.forEach((property) => (updatedUser[property] = undefined));
+  updatedUser.profile.photo = cloudinary.v2.url(updatedUser.profile.photo);
+  res.status(200).json({ status: 'Success', data: updatedUser });
 });
 
 const test = asyncHandler(async (req, res, next) => {
   res.status(200).json({ status: 'Success', data: 'test' });
-})
+});
 export { updateUser, test };

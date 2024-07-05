@@ -10,7 +10,10 @@ const authMiddleware = asyncHandler(async (req, res, next) => {
   const encodedToken = token.split(' ')[1];
   if (!encodedToken) return next(new APIError('Token not found', 403));
   const decodedToken = await verifyAccessToken(encodedToken);
-  const user = await prisma.user.findUnique({ where: { id: decodedToken.id } });
+  const user = await prisma.user.findUnique({
+    where: { id: decodedToken.id },
+    include: { profile: true },
+  });
   if (!user) return next(new APIError('You are not allowed.', 401));
   req.user = user;
   next();

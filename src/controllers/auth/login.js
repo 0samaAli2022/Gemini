@@ -25,6 +25,14 @@ const login = asyncHandler(async (req, res, next) => {
     where: {
       email,
     },
+    include: {
+      profile: {
+        select: {
+          photo: true,
+          bio: true,
+        },
+      },
+    },
   });
   if (!user) {
     return res.status(401).json({
@@ -36,30 +44,6 @@ const login = asyncHandler(async (req, res, next) => {
     return next(new APIError('Wrong email or password.', 400));
 
   if (!user.emailVerified) {
-    const plainVerfiyToken = crypto.randomBytes(64).toString('hex');
-    const hashedToken = crypto
-      .createHash('sha256')
-      .update(plainVerfiyToken)
-      .digest('hex');
-
-    await prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        emailVerificationToken: hashedToken,
-      },
-    });
-    const info = {
-      from: `Mailer Company`,
-      to: email,
-      subject: 'Email verfication',
-      text: 'Verfiy your email',
-      htm: `<h1>Email verfication </h1>
-                      <p>Hello ${user.name}, Please follow this link to verfiy your account. </p><a href= 'http://localhost:3000/api/v1/auth/verfiy/${plainVerfiyToken}'> Click link </a>
-                      <p>If you did not verfiy your account you won't be able to use a lot of website features</p>`,
-    };
-    await sendEmailToUser(info);
     return next(
       new APIError(
         "You haven't verified your account yet. Please follow the link sent to your email to verify.",
@@ -91,7 +75,7 @@ const login = asyncHandler(async (req, res, next) => {
     'updatedAt',
   ];
   propertiesToHide.forEach((property) => (user[property] = undefined));
-  user.photo = cloudinary.v2.url(user.photo);
+  user.profile.photo = cloudinary.v2.url(user.profile.photo);
   res
     .status(200)
     .json({ status: 'success', data: { user, token: accessToken } });

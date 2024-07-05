@@ -24,6 +24,10 @@ const updateUserValidator = [
       }
       return true;
     }),
+  check('bio')
+    .optional()
+    .isLength({ max: 500 })
+    .withMessage('Bio can be 500 characters at most'),
   validationMiddleware,
 ];
 

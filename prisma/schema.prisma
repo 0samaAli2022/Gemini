@@ -8,37 +8,97 @@ datasource db {
 }
 
 model User {
-  id                         String    @id @db.Uuid
+  id                         String           @id @db.Uuid
   name                       String
-  email                      String    @unique
+  email                      String           @unique
   password                   String
-  role                       Role      @default(USER)
-  photo                      String    @default("users/default_user")
-  isActive                   Boolean   @default(true)
-  createdAt                  DateTime  @default(now())
-  updatedAt                  DateTime  @updatedAt
+  role                       Role             @default(USER)
+  isActive                   Boolean          @default(true)
+  createdAt                  DateTime         @default(now())
+  updatedAt                  DateTime         @updatedAt
   passwordResetToken         String?
   passwordResetTokenVerified Boolean?
   passwordResetTokenExpire   String?
   passwordChangedAt          String?
-  emailVerificationToken     String?   @unique
-  emailVerified              Boolean   @default(false)
-  Profile                    Profile[]
+  emailVerificationToken     String?          @unique
+  emailVerified              Boolean          @default(false)
+  profile                    Profile?
+  posts                      Post[]
+  comments                   Comment[]
+  likes                      Like[]
+  followers                  FollowRelation[] @relation(name: "followed")
+  following                  FollowRelation[] @relation(name: "follower")
 
   @@map("users")
 }
 
 model Profile {
   id      String @id @db.Uuid
-  user_id String @db.Uuid
-  photo   String
-  bio     String
-  user    User   @relation(fields: [user_id], references: [id])
+  user_id String @unique @db.Uuid
+  photo   String @default("users/default_user")
+  bio     String @default("No Bio, Yet!")
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
+  @@index([user_id])
   @@map("profiles")
+}
+
+model Post {
+  id            String    @id @db.Uuid
+  user_id       String    @db.Uuid
+  title         String
+  content       String
+  images        String[]
+  privacy       Privacy   @default(FOLLOWERS)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  likesCount    Int       @default(0)
+  commentsCount Int       @default(0)
+  author        User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  comments      Comment[]
+  likes         Like[]
+
+  @@map("posts")
+}
+
+model Like {
+  id      String @id @db.Uuid
+  user_id String @db.Uuid
+  post_id String @db.Uuid
+  post    Post   @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("likes")
+}
+
+model Comment {
+  id        String   @id @db.Uuid
+  user_id   String   @db.Uuid
+  post_id   String   @db.Uuid
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  post      Post     @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  author    User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}
+
+model FollowRelation {
+  id          String @id @db.Uuid
+  follower_id String @db.Uuid
+  followed_id String @db.Uuid
+  follower    User   @relation(name: "follower", fields: [follower_id], references: [id], onDelete: Cascade)
+  followed    User   @relation(name: "followed", fields: [followed_id], references: [id], onDelete: Cascade)
 }
 
 enum Role {
   USER
   ADMIN
+}
+
+enum Privacy {
+  PUBLIC
+  PRIVATE
+  FOLLOWERS
 }

@@ -30,8 +30,8 @@ const uploadImage = asyncHandler(async (imageBuffer, filename, foldername) => {
 
 const uploadPhotoCloudinary = asyncHandler(async (req, res, next) => {
   if (!req.file) return next();
-  if (req.user.photo !== 'users/default_user') {
-    await cloudinary.v2.uploader.destroy(req.user.photo);
+  if (req.user.profile.photo !== 'users/default_user') {
+    await cloudinary.v2.uploader.destroy(req.user.profile.photo);
   }
   const result = await uploadImage(req.file.buffer, req.file.filename, 'users');
   console.log(result);

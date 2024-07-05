@@ -1,10 +1,11 @@
 import express from 'express';
-import { authMiddleware } from '../middleware/auth.middleware.js';
+import { authMiddleware, isAdmin } from '../middleware/auth.middleware.js';
 import { checkUserAuthorization } from '../middleware/checkUserAuthorization.js';
 import {
   getAllUsers,
   getUser,
   updateUser,
+  deleteUser,
   test,
 } from '../controllers/user/user.index.js';
 import { updateUserValidator } from '../utils/validation/user.validator.js';
@@ -25,6 +26,7 @@ router.route('/').get(authMiddleware, getAllUsers);
 router
   .route('/:id')
   .get(authMiddleware, getUser)
+  .delete(authMiddleware, isAdmin, deleteUser)
   .patch(
     authMiddleware,
     checkUserAuthorization,

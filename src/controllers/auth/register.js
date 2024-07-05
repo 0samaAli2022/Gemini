@@ -16,7 +16,6 @@ const prisma = new PrismaClient();
  */
 const register = asyncHandler(async (req, res, next) => {
   const { name, email, password } = req.body;
-  const role = 'USER';
   const hashedPassword = await hashPassword(password);
   const user = await prisma.user.create({
     data: {
@@ -24,7 +23,19 @@ const register = asyncHandler(async (req, res, next) => {
       name,
       email,
       password: hashedPassword,
-      role: role,
+      profile: {
+        create: {
+          id: uuid4(),
+        },
+      },
+    },
+    include: {
+      profile: {
+        select: {
+          photo: true,
+          bio: true,
+        },
+      },
     },
   });
   if (!user)
@@ -71,7 +82,7 @@ const register = asyncHandler(async (req, res, next) => {
     'updatedAt',
   ];
   propertiesToHide.forEach((property) => (user[property] = undefined));
-  res.status(200).json({ status: 'Success', data: user });
+  res.status(200).json({ status: 'Success', data: { user } });
 });
 
 export { register };

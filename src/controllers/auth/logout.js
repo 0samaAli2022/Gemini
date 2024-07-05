@@ -17,7 +17,7 @@ const logout = asyncHandler(async (req, res, next) => {
   res.clearCookie('refreshToken', {
     httpOnly: true,
   });
-  res.status(200).json({ status: 'Success' });
+  res.status(200).json({ status: 'Success', data: 'Logged Out' });
 });
 
 export { logout };

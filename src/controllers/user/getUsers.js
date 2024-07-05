@@ -4,11 +4,32 @@ import cloudinary from 'cloudinary';
 const prisma = new PrismaClient();
 
 const getAllUsers = asyncHandler(async (req, res, next) => {
-  const users = await prisma.user.findMany();
+  const users = await prisma.user.findMany({
+    include: {
+      profile: {
+        select: {
+          photo: true,
+          bio: true,
+        },
+      },
+    },
+  });
+  // Remove password and tokens from output
+  const propertiesToHide = [
+    'password',
+    'passwordChangedAt',
+    'passwordResetToken',
+    'passwordResetTokenExpire',
+    'passwordResetTokenVerified',
+    'emailVerificationToken',
+    'createdAt',
+    'updatedAt',
+  ];
   users.forEach((user) => {
-    user.photo = cloudinary.v2.url(user.photo);
-  })
-  res.status(200).json({ status: 'Success', data: users });
+    propertiesToHide.forEach((property) => (user[property] = undefined));
+    user.profile.photo = cloudinary.v2.url(user.profile.photo);
+  });
+  res.status(200).json({ status: 'Success', data: { users } });
 });
 
 const getUser = asyncHandler(async (req, res, next) => {
@@ -17,9 +38,29 @@ const getUser = asyncHandler(async (req, res, next) => {
     where: {
       id: id,
     },
+    include: {
+      profile: {
+        select: {
+          photo: true,
+          bio: true,
+        },
+      },
+    },
   });
-  user.photo = cloudinary.v2.url(user.photo);
-  res.status(200).json({ status: 'Success', data: user });
+  // Remove password and tokens from output
+  const propertiesToHide = [
+    'password',
+    'passwordChangedAt',
+    'passwordResetToken',
+    'passwordResetTokenExpire',
+    'passwordResetTokenVerified',
+    'emailVerificationToken',
+    'createdAt',
+    'updatedAt',
+  ];
+  propertiesToHide.forEach((property) => (user[property] = undefined));
+  user.profile.photo = cloudinary.v2.url(user.profile.photo);
+  res.status(200).json({ status: 'Success', data: { user } });
 });
 
 export { getAllUsers, getUser };
