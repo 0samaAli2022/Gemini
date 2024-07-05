@@ -1,7 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import { PrismaClient } from '@prisma/client';
 import APIError from '../../utils/APIError.js';
-import sanitizeUser from '../../utils/sanitizeUser.js';
+import sanitizeUser from '../../utils/sanitization/sanitizeUser.js';
 const prisma = new PrismaClient();
 
 const deleteUser = asyncHandler(async (req, res, next) => {

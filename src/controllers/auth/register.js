@@ -6,7 +6,7 @@ import asyncHandler from 'express-async-handler';
 import { sendEmailToUser } from '../../config/Nodemailer/nodemailer.js';
 import uuid4 from 'uuid4';
 import cloudinary from 'cloudinary';
-import sanitizeUser from '../../utils/sanitizeUser.js';
+import sanitizeUser from '../../utils/sanitization/sanitizeUser.js';
 
 const prisma = new PrismaClient();
 

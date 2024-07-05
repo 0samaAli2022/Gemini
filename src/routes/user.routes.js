@@ -9,16 +9,8 @@ import {
   test,
 } from '../controllers/user/user.index.js';
 import { updateUserValidator } from '../utils/validation/user.validator.js';
-import {
-  uploadSinglePhoto,
-  uploadMultiPhotos,
-  resizeUserPhoto,
-  resizeUserPhotos,
-} from '../config/Multer/multer.js';
-import {
-  uploadPhotoCloudinary,
-  uploadPhotosCloudinary,
-} from '../config/Cloudinary/cloudinary.js';
+import { uploadSinglePhoto, resizePhotos } from '../config/Multer/multer.js';
+import { uploadPhotosCloudinary } from '../config/Cloudinary/cloudinary.js';
 
 const router = express.Router();
 
@@ -32,16 +24,8 @@ router
     checkUserAuthorization,
     updateUserValidator,
     uploadSinglePhoto,
-    resizeUserPhoto,
-    uploadPhotoCloudinary,
+    resizePhotos('user'),
+    uploadPhotosCloudinary,
     updateUser
   );
-router.post(
-  '/upload',
-  authMiddleware,
-  uploadMultiPhotos,
-  resizeUserPhotos,
-  uploadPhotosCloudinary,
-  test
-);
 export default router;
