@@ -1,6 +1,8 @@
 import asyncHandler from 'express-async-handler';
 import { PrismaClient } from '@prisma/client';
 import cloudinary from 'cloudinary';
+import sanitizeUser from '../../utils/sanitizeUser.js';
+
 const prisma = new PrismaClient();
 
 const getAllUsers = asyncHandler(async (req, res, next) => {
@@ -14,20 +16,11 @@ const getAllUsers = asyncHandler(async (req, res, next) => {
       },
     },
   });
-  // Remove password and tokens from output
-  const propertiesToHide = [
-    'password',
-    'passwordChangedAt',
-    'passwordResetToken',
-    'passwordResetTokenExpire',
-    'passwordResetTokenVerified',
-    'emailVerificationToken',
-    'createdAt',
-    'updatedAt',
-  ];
+
   users.forEach((user) => {
-    propertiesToHide.forEach((property) => (user[property] = undefined));
     user.profile.photo = cloudinary.v2.url(user.profile.photo);
+    // Remove password and tokens from output
+    sanitizeUser(user);
   });
   res.status(200).json({ status: 'Success', data: { users } });
 });
@@ -47,19 +40,9 @@ const getUser = asyncHandler(async (req, res, next) => {
       },
     },
   });
-  // Remove password and tokens from output
-  const propertiesToHide = [
-    'password',
-    'passwordChangedAt',
-    'passwordResetToken',
-    'passwordResetTokenExpire',
-    'passwordResetTokenVerified',
-    'emailVerificationToken',
-    'createdAt',
-    'updatedAt',
-  ];
-  propertiesToHide.forEach((property) => (user[property] = undefined));
   user.profile.photo = cloudinary.v2.url(user.profile.photo);
+  // Remove password and tokens from output
+  sanitizeUser(user);
   res.status(200).json({ status: 'Success', data: { user } });
 });
 

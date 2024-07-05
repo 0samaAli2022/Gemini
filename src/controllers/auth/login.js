@@ -10,6 +10,7 @@ import asyncHandler from 'express-async-handler';
 import { sendEmailToUser } from '../../config/Nodemailer/nodemailer.js';
 import { redisClient } from '../../config/Redis/redisClient.js';
 import cloudinary from 'cloudinary';
+import sanitizeUser from '../../utils/sanitizeUser.js';
 
 const prisma = new PrismaClient();
 
@@ -64,18 +65,8 @@ const login = asyncHandler(async (req, res, next) => {
   if (process.env.NODE_ENV === 'prod') cookieOptions.secure = true;
   res.cookie('refreshToken', refreshToken, cookieOptions);
   // Remove password and tokens from output
-  const propertiesToHide = [
-    'password',
-    'passwordChangedAt',
-    'passwordResetToken',
-    'passwordResetTokenExpire',
-    'passwordResetTokenVerified',
-    'emailVerificationToken',
-    'createdAt',
-    'updatedAt',
-  ];
-  propertiesToHide.forEach((property) => (user[property] = undefined));
   user.profile.photo = cloudinary.v2.url(user.profile.photo);
+  sanitizeUser(user);
   res
     .status(200)
     .json({ status: 'success', data: { user, token: accessToken } });

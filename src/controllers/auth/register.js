@@ -5,6 +5,8 @@ import APIError from '../../utils/APIError.js';
 import asyncHandler from 'express-async-handler';
 import { sendEmailToUser } from '../../config/Nodemailer/nodemailer.js';
 import uuid4 from 'uuid4';
+import cloudinary from 'cloudinary';
+import sanitizeUser from '../../utils/sanitizeUser.js';
 
 const prisma = new PrismaClient();
 
@@ -70,18 +72,9 @@ const register = asyncHandler(async (req, res, next) => {
   };
   await sendEmailToUser(info);
 
+  user.profile.photo = cloudinary.v2.url(user.profile.photo);
   // Remove password and tokens from output
-  const propertiesToHide = [
-    'password',
-    'passwordChangedAt',
-    'passwordResetToken',
-    'passwordResetTokenExpire',
-    'passwordResetTokenVerified',
-    'emailVerificationToken',
-    'createdAt',
-    'updatedAt',
-  ];
-  propertiesToHide.forEach((property) => (user[property] = undefined));
+  sanitizeUser(user);
   res.status(200).json({ status: 'Success', data: { user } });
 });
 

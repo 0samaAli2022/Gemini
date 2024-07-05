@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import { PrismaClient } from '@prisma/client';
 import cloudinary from 'cloudinary';
+import sanitizeUser from '../../utils/sanitizeUser.js';
 
 const prisma = new PrismaClient();
 
@@ -41,19 +42,9 @@ const updateUser = asyncHandler(async (req, res, next) => {
     },
   });
 
-  const propertiesToHide = [
-    'password',
-    'passwordChangedAt',
-    'passwordResetToken',
-    'passwordResetTokenExpire',
-    'passwordResetTokenVerified',
-    'emailVerificationToken',
-    'createdAt',
-    'updatedAt',
-  ];
-  propertiesToHide.forEach((property) => (updatedUser[property] = undefined));
   updatedUser.profile.photo = cloudinary.v2.url(updatedUser.profile.photo);
-  res.status(200).json({ status: 'Success', data: updatedUser });
+  sanitizeUser(updatedUser);
+  res.status(200).json({ status: 'Success', data: { user: updatedUser } });
 });
 
 const test = asyncHandler(async (req, res, next) => {

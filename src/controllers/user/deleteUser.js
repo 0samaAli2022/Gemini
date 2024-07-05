@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import { PrismaClient } from '@prisma/client';
 import APIError from '../../utils/APIError.js';
+import sanitizeUser from '../../utils/sanitizeUser.js';
 const prisma = new PrismaClient();
 
 const deleteUser = asyncHandler(async (req, res, next) => {
@@ -19,22 +20,12 @@ const deleteUser = asyncHandler(async (req, res, next) => {
       profile: true,
     },
   });
-  // Remove password and tokens from output
-  const propertiesToHide = [
-    'password',
-    'passwordChangedAt',
-    'passwordResetToken',
-    'passwordResetTokenExpire',
-    'passwordResetTokenVerified',
-    'emailVerificationToken',
-    'createdAt',
-    'updatedAt',
-  ];
-  propertiesToHide.forEach((property) => (deletedUser[property] = undefined));
   deletedUser.profile.photo = cloudinary.v2.url(deletedUser.profile.photo);
+  // Remove password and tokens from output
+  sanitizeUser(deletedUser);
   res.status(200).json({
     status: 'Success',
-    data: { deletedUser },
+    data: { user: deletedUser },
   });
 });
 export { deleteUser };
