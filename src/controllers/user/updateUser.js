@@ -42,7 +42,8 @@ const updateUser = asyncHandler(async (req, res, next) => {
     },
   });
 
-  updatedUser.profile.photo = cloudinary.v2.url(updatedUser.profile.photo);
+  updatedUser.profile.photo =
+    process.env.CLOUD_IMG_URL + updatedUser.profile.photo;
   sanitizeUser(updatedUser);
   res.status(200).json({ status: 'Success', data: { user: updatedUser } });
 });

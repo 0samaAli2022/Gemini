@@ -20,7 +20,8 @@ const deleteUser = asyncHandler(async (req, res, next) => {
       profile: true,
     },
   });
-  deletedUser.profile.photo = cloudinary.v2.url(deletedUser.profile.photo);
+  deletedUser.profile.photo =
+    process.env.CLOUD_IMG_URL + deletedUser.profile.photo;
   // Remove password and tokens from output
   sanitizeUser(deletedUser);
   res.status(200).json({

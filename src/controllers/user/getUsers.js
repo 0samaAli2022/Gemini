@@ -18,7 +18,7 @@ const getAllUsers = asyncHandler(async (req, res, next) => {
   });
 
   users.forEach((user) => {
-    user.profile.photo = cloudinary.v2.url(user.profile.photo);
+    user.profile.photo = process.env.CLOUD_IMG_URL + user.profile.photo;
     // Remove password and tokens from output
     sanitizeUser(user);
   });
@@ -40,7 +40,7 @@ const getUser = asyncHandler(async (req, res, next) => {
       },
     },
   });
-  user.profile.photo = cloudinary.v2.url(user.profile.photo);
+  user.profile.photo = process.env.CLOUD_IMG_URL + user.profile.photo;
   // Remove password and tokens from output
   sanitizeUser(user);
   res.status(200).json({ status: 'Success', data: { user } });

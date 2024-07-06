@@ -25,8 +25,8 @@ const updatePost = asyncHandler(async (req, res, next) => {
       images: req.images || post.images,
     },
   });
-  updatedPost.images = updatedPost.images.map((image) =>
-    cloudinary.v2.url(image)
+  updatedPost.images = updatedPost.images.map(
+    (image) => process.env.CLOUD_IMG_URL + image
   );
   res.status(200).json({ status: 'success', data: { post: updatedPost } });
 });
