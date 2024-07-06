@@ -6,9 +6,8 @@ import {
   createPost,
   updatePost,
   deletePost,
-  // likePost,
-  // dislikePost,
-  // getPostsByUser,
+  likePost,
+  dislikePost,
 } from '../controllers/post/post.index.js';
 import { createPostValidator } from '../utils/validation/post.validator.js';
 import { resizePhotos, uploadMultiPhotos } from '../config/Multer/multer.js';
@@ -31,5 +30,8 @@ router
     uploadPhotosCloudinary,
     updatePost
   );
+
+router.route('/:id/like').post(authMiddleware, likePost);
+router.route('/:id/dislike').post(authMiddleware, dislikePost);
 
 export default router;
