@@ -11,6 +11,7 @@ import {
   addComment,
   getComments,
   deleteComment,
+  searchPost,
 } from '../controllers/post/post.index.js';
 import { createPostValidator } from '../utils/validation/post.validator.js';
 import { resizePhotos, uploadMultiPhotos } from '../config/Multer/multer.js';
@@ -22,6 +23,7 @@ router
   .route('/')
   .get(authMiddleware, getAllPosts)
   .post(authMiddleware, createPostValidator, createPost);
+router.route('/search').get(searchPost);
 router
   .route('/:id')
   .get(authMiddleware, getPost)

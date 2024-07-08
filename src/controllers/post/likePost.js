@@ -17,7 +17,6 @@ const likePost = asyncHandler(async (req, res, next) => {
   if (!post) {
     return next(new APIError('Post not found', 404));
   }
-  console.log(post.likes);
   if (
     post.likes.some(
       (like) => like.user_id === req.user.id && like.post_id === id
@@ -41,6 +40,14 @@ const likePost = asyncHandler(async (req, res, next) => {
         likesCount: {
           increment: 1,
         },
+      },
+    }),
+    prisma.notification.create({
+      data: {
+        id: uuid4(),
+        message: `@${req.user.name} liked your post: ${post.title}`,
+        user: { connect: { id: post.user_id } },
+        post: { connect: { id } },
       },
     }),
   ]);

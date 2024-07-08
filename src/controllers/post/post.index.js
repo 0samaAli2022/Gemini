@@ -6,3 +6,4 @@ export { likePost, dislikePost } from './likePost.js';
 export { addComment } from './addComment.js';
 export { getComments } from './getComments.js';
 export { deleteComment } from './deleteComment.js';
+export { searchPost } from './searchPost.js';

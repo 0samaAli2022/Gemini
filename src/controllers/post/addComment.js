@@ -56,6 +56,14 @@ const addComment = asyncHandler(async (req, res, next) => {
         },
       },
     }),
+    prisma.notification.create({
+      data: {
+        id: uuid4(),
+        message: `@${req.user.name} commented on your post: ${post.title}`,
+        user: { connect: { id: post.user_id } },
+        post: { connect: { id } },
+      },
+    }),
   ]);
   res.status(200).json({ status: 'success', data: { comment } });
 });

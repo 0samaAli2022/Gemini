@@ -32,11 +32,15 @@ const updateUser = asyncHandler(async (req, res, next) => {
       id: req.user.id,
     },
     data: dataToUpdate,
-    include: {
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      emailVerified: true,
       profile: {
         select: {
           photo: true,
-          bio: true,
         },
       },
     },
@@ -44,11 +48,7 @@ const updateUser = asyncHandler(async (req, res, next) => {
 
   updatedUser.profile.photo =
     process.env.CLOUD_IMG_URL + updatedUser.profile.photo;
-  sanitizeUser(updatedUser);
   res.status(200).json({ status: 'Success', data: { user: updatedUser } });
 });
 
-const test = asyncHandler(async (req, res, next) => {
-  res.status(200).json({ status: 'Success', data: 'test' });
-});
-export { updateUser, test };
+export { updateUser };

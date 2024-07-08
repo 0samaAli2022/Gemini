@@ -16,14 +16,22 @@ const deleteUser = asyncHandler(async (req, res, next) => {
     where: {
       id: id,
     },
-    include: {
-      profile: true,
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      emailVerified: true,
+      profile: {
+        select: {
+          photo: true,
+        },
+      },
     },
   });
   deletedUser.profile.photo =
     process.env.CLOUD_IMG_URL + deletedUser.profile.photo;
   // Remove password and tokens from output
-  sanitizeUser(deletedUser);
   res.status(200).json({
     status: 'Success',
     data: { user: deletedUser },

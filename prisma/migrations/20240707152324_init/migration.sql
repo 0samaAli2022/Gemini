@@ -80,6 +80,17 @@ CREATE TABLE "FollowRelation" (
     CONSTRAINT "FollowRelation_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "notifications" (
+    "id" UUID NOT NULL,
+    "user_id" UUID NOT NULL,
+    "post_id" UUID NOT NULL,
+    "message" TEXT NOT NULL,
+    "status" BOOLEAN NOT NULL DEFAULT false,
+
+    CONSTRAINT "notifications_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
@@ -91,6 +102,21 @@ CREATE UNIQUE INDEX "profiles_user_id_key" ON "profiles"("user_id");
 
 -- CreateIndex
 CREATE INDEX "profiles_user_id_idx" ON "profiles"("user_id");
+
+-- CreateIndex
+CREATE INDEX "posts_user_id_idx" ON "posts"("user_id");
+
+-- CreateIndex
+CREATE INDEX "comments_user_id_idx" ON "comments"("user_id");
+
+-- CreateIndex
+CREATE INDEX "comments_post_id_idx" ON "comments"("post_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "FollowRelation_follower_id_followed_id_key" ON "FollowRelation"("follower_id", "followed_id");
+
+-- CreateIndex
+CREATE INDEX "notifications_user_id_idx" ON "notifications"("user_id");
 
 -- AddForeignKey
 ALTER TABLE "profiles" ADD CONSTRAINT "profiles_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -115,3 +141,9 @@ ALTER TABLE "FollowRelation" ADD CONSTRAINT "FollowRelation_follower_id_fkey" FO
 
 -- AddForeignKey
 ALTER TABLE "FollowRelation" ADD CONSTRAINT "FollowRelation_followed_id_fkey" FOREIGN KEY ("followed_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "notifications" ADD CONSTRAINT "notifications_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "notifications" ADD CONSTRAINT "notifications_post_id_fkey" FOREIGN KEY ("post_id") REFERENCES "posts"("id") ON DELETE CASCADE ON UPDATE CASCADE;

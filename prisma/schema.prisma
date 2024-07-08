@@ -28,6 +28,7 @@ model User {
   likes                      Like[]
   followers                  FollowRelation[] @relation(name: "followed")
   following                  FollowRelation[] @relation(name: "follower")
+  notifications              Notification[]
 
   @@map("users")
 }
@@ -44,20 +45,22 @@ model Profile {
 }
 
 model Post {
-  id            String    @id @db.Uuid
-  user_id       String    @db.Uuid
+  id            String         @id @db.Uuid
+  user_id       String         @db.Uuid
   title         String
   content       String
   images        String[]
-  privacy       Privacy   @default(FOLLOWERS)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  likesCount    Int       @default(0)
-  commentsCount Int       @default(0)
-  author        User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  privacy       Privacy        @default(FOLLOWERS)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  likesCount    Int            @default(0)
+  commentsCount Int            @default(0)
+  author        User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
   comments      Comment[]
   likes         Like[]
+  Notification  Notification[]
 
+  @@index([user_id])
   @@map("posts")
 }
 
@@ -81,6 +84,8 @@ model Comment {
   post      Post     @relation(fields: [post_id], references: [id], onDelete: Cascade)
   author    User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
+  @@index([user_id])
+  @@index([post_id])
   @@map("comments")
 }
 
@@ -90,6 +95,21 @@ model FollowRelation {
   followed_id String @db.Uuid
   follower    User   @relation(name: "follower", fields: [follower_id], references: [id], onDelete: Cascade)
   followed    User   @relation(name: "followed", fields: [followed_id], references: [id], onDelete: Cascade)
+
+  @@unique([follower_id, followed_id])
+}
+
+model Notification {
+  id      String  @id @db.Uuid
+  user_id String  @db.Uuid
+  post_id String  @db.Uuid
+  message String
+  status  Boolean @default(false)
+  user    User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  post    Post    @relation(fields: [post_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@map("notifications")
 }
 
 enum Role {
