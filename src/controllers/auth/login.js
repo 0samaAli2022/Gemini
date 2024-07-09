@@ -7,7 +7,6 @@ import {
 import APIError from '../../utils/APIError.js';
 import asyncHandler from 'express-async-handler';
 import { redisClient } from '../../config/Redis/redisClient.js';
-import cloudinary from 'cloudinary';
 
 const prisma = new PrismaClient();
 
@@ -28,6 +27,7 @@ const login = asyncHandler(async (req, res, next) => {
       name: true,
       email: true,
       role: true,
+      password: true,
       emailVerified: true,
       profile: {
         select: {
@@ -66,7 +66,8 @@ const login = asyncHandler(async (req, res, next) => {
   if (process.env.NODE_ENV === 'prod') cookieOptions.secure = true;
   res.cookie('refreshToken', refreshToken, cookieOptions);
   // Remove password and tokens from output
-  user.profile.photo = cloudinary.v2.url(user.profile.photo);
+  user.profile.photo = process.env.CLOUD_IMG_URL + user.profile.photo;
+  user.password = undefined;
   res
     .status(200)
     .json({ status: 'success', data: { user, token: accessToken } });

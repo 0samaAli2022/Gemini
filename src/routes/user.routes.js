@@ -15,7 +15,6 @@ import {
 } from '../controllers/user/user.index.js';
 import { updateUserValidator } from '../utils/validation/user.validator.js';
 import { uploadSinglePhoto } from '../config/Multer/multer.js';
-import { uploadPhotosCloudinary } from '../config/Cloudinary/cloudinary.js';
 
 const router = express.Router();
 
@@ -25,12 +24,12 @@ router.route('/search').get(authMiddleware, searchUser);
 router
   .route('/:id')
   .get(authMiddleware, getUser)
-  .delete(authMiddleware, isAdmin, deleteUser)
+  .delete(deleteUser)
   .patch(
     authMiddleware,
     checkUserAuthorization,
-    updateUserValidator,
     uploadSinglePhoto,
+    updateUserValidator,
     updateUser
   );
 

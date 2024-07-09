@@ -1,23 +1,23 @@
-import nodeMailer from "nodemailer";
-import asyncHandler from "express-async-handler";
+import nodeMailer from 'nodemailer';
+import asyncHandler from 'express-async-handler';
+import mailgunTransport from 'nodemailer-mailgun-transport';
 
-const transporter = nodeMailer.createTransport({
-  service: "gmail",
+const auth = {
   auth: {
-    user: process.env.MAILER_APP_EMAIL,
-    pass: process.env.MAILER_APP_PASSWORD,
+    api_key: process.env.MAILGUN_API_KEY,
+    domain: process.env.MAILGUN_DOMAIN,
   },
-});
+};
+const transporter = nodeMailer.createTransport(mailgunTransport(auth));
 
 const sendEmailToUser = asyncHandler(async (info) => {
-  const send = await transporter.sendMail({
-    from: info.from, // sender address
+  await transporter.sendMail({
+    from: info.from || `Gemini App <no-reply@gemini.com>`, // sender address
     to: info.to, // list of receivers
     subject: info.subject, // Subject line
     text: info.text, // plain text body
     html: info.htm, // html body
   });
-  console.log("Message ID : => ", send.messageId);
 });
 
 export { sendEmailToUser };

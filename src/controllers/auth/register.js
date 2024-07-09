@@ -63,12 +63,10 @@ const register = asyncHandler(async (req, res, next) => {
       emailVerificationToken: hashedToken,
     },
   });
-
   const info = {
-    from: `Mailer Company`,
     to: email,
     subject: 'Email verfication',
-    text: 'Verfiy your email',
+    text: 'Verifiy your email',
     htm: `<h1>Email verfication </h1>
                       <p>Hello ${user.name}, Please follow this link to verfiy your account. </p><a href= 'http://localhost:3000/api/v1/auth/verfiy/${plainVerfiyToken}'> Click link </a>
                       <p>If you did not verfiy your account you won't be able to use a lot of website features</p>`,

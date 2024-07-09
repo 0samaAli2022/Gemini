@@ -28,31 +28,4 @@ const uploadImage = asyncHandler(async (imageBuffer, filename, foldername) => {
   return uploadResult;
 });
 
-const uploadPhotosCloudinary = asyncHandler(async (req, res, next) => {
-  if (!req.files && !req.file) return next();
-  if (req.file) {
-    if (req.user.profile.photo !== 'users/default_user') {
-      await cloudinary.v2.uploader.destroy(req.user.profile.photo);
-    }
-    const result = await uploadImage(
-      req.file.buffer,
-      req.file.filename,
-      'users'
-    );
-    console.log(result);
-    req.file.filename = result.public_id;
-  } else if (req.files) {
-    req.images = [];
-    for (let i = 0; i < req.files.length; i++) {
-      const result = await uploadImage(
-        req.files[i].buffer,
-        req.files[i].filename,
-        'posts'
-      );
-      req.images = [...req.images, result.public_id];
-    }
-  }
-  next();
-});
-
-export { uploadPhotosCloudinary, uploadImage };
+export { uploadImage };
