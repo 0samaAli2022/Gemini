@@ -20,8 +20,8 @@ const createPost = asyncHandler(async (req, res) => {
     postData.privacy = privacy;
   }
   if (req.files) {
-    const images = []
-    for(let i = 0; i < req.files.length; i++) {
+    const images = [];
+    for (let i = 0; i < req.files.length; i++) {
       const file = req.files[i];
       file.buffer = await imageConfig(file.buffer);
       file.filename = `${postData.id}-${Date.now()}-${i + 1}`;
@@ -32,9 +32,13 @@ const createPost = asyncHandler(async (req, res) => {
   }
   const post = await prisma.post.create({
     data: postData,
-    include: { author: { select: { name: true } } },
+    include: {
+      author: { select: { name: true, profile: { select: { photo: true } } } },
+    },
   });
-
+  post.images = post.images.map((image) => {
+    return process.env.CLOUD_IMG_URL + image;
+  })
   res.status(200).json({ status: 'success', data: { post } });
 });
 

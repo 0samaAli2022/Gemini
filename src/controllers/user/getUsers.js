@@ -1,7 +1,6 @@
 import asyncHandler from 'express-async-handler';
 import { PrismaClient } from '@prisma/client';
 
-
 const prisma = new PrismaClient();
 
 const getAllUsers = asyncHandler(async (req, res, next) => {
@@ -35,12 +34,13 @@ const getAllUsers = asyncHandler(async (req, res, next) => {
     user.profile.photo = process.env.CLOUD_IMG_URL + user.profile.photo;
     // Remove password and tokens from output
   });
+  const pagesCount = Math.ceil((await prisma.user.count()) / take);
   res.status(200).json({
     status: 'Success',
     data: { users },
     meta: {
       count: users.length,
-      pagesCount: Math.ceil(users.length / take),
+      pagesCount,
       currentPage: page,
       perPage: take,
     },

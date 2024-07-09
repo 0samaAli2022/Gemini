@@ -12,23 +12,24 @@ const searchPost = asyncHandler(async (req, res) => {
   const sort = req.query.sort || 'updatedAt';
   const order = req.query.order || 'desc';
   const orderBy = { [sort]: order };
+  const whereCondition = {
+    OR: [
+      {
+        title: {
+          contains: keyword,
+          mode: 'insensitive',
+        },
+      },
+      {
+        content: {
+          contains: keyword,
+          mode: 'insensitive',
+        },
+      },
+    ],
+  };
   const posts = await prisma.post.findMany({
-    where: {
-      OR: [
-        {
-          title: {
-            contains: keyword,
-            mode: 'insensitive',
-          },
-        },
-        {
-          content: {
-            contains: keyword,
-            mode: 'insensitive',
-          },
-        },
-      ],
-    },
+    where: whereCondition,
     include: {
       author: {
         select: {
@@ -57,12 +58,15 @@ const searchPost = asyncHandler(async (req, res) => {
     take,
     orderBy,
   });
+  const pagesCount = Math.ceil(
+    (await prisma.post.count({ where: whereCondition })) / take
+  );
   res.status(200).json({
     status: 'success',
     data: { count: posts.length, posts },
     meta: {
       count: posts.length,
-      pagesCount: Math.ceil(posts.length / take),
+      pagesCount,
       currentPage: page,
       perPage: take,
     },

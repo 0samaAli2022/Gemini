@@ -24,7 +24,7 @@ router.route('/search').get(authMiddleware, searchUser);
 router
   .route('/:id')
   .get(authMiddleware, getUser)
-  .delete(deleteUser)
+  .delete(authMiddleware, isAdmin, deleteUser)
   .patch(
     authMiddleware,
     checkUserAuthorization,

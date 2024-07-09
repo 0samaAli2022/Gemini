@@ -39,89 +39,48 @@ const getAllPosts = asyncHandler(async (req, res) => {
       AND: [{ author: { id: userId } }, whereCondition],
     };
   }
-  if (userId !== undefined) {
-    const posts = await prisma.post.findMany({
-      skip,
-      take,
-      orderBy,
-      where: whereCondition,
-      include: {
-        author: {
-          select: {
-            name: true,
-            profile: {
-              select: {
-                photo: true,
-              },
-            },
-          },
-        },
-        comments: {
-          select: {
-            content: true,
-            author: {
-              select: {
-                id: true,
-                name: true,
-                profile: { select: { photo: true } },
-              },
+  const posts = await prisma.post.findMany({
+    skip,
+    take,
+    orderBy,
+    where: whereCondition,
+    include: {
+      author: {
+        select: {
+          name: true,
+          profile: {
+            select: {
+              photo: true,
             },
           },
         },
       },
-    });
-    res.status(200).json({
-      status: 'success',
-      data: { posts },
-      meta: {
-        count: posts.length,
-        pagesCount: Math.ceil(posts.length / take),
-        currentPage: page,
-        perPage: take,
-      },
-    });
-  } else {
-    const posts = await prisma.post.findMany({
-      skip,
-      take,
-      orderBy,
-      where: whereCondition,
-      include: {
-        author: {
-          select: {
-            name: true,
-            profile: {
-              select: {
-                photo: true,
-              },
-            },
-          },
-        },
-        comments: {
-          select: {
-            content: true,
-            author: {
-              select: {
-                id: true,
-                name: true,
-                profile: { select: { photo: true } },
-              },
+      comments: {
+        select: {
+          content: true,
+          author: {
+            select: {
+              id: true,
+              name: true,
+              profile: { select: { photo: true } },
             },
           },
         },
       },
-    });
-    res.status(200).json({
-      status: 'success',
-      data: { posts },
-      meta: {
-        count: posts.length,
-        pagesCount: Math.ceil(posts.length / take),
-        currentPage: page,
-        perPage: take,
-      },
-    });
-  }
+    },
+  });
+
+  const pagesCount = Math.ceil((await prisma.post.count()) / take);
+  res.status(200).json({
+    status: 'success',
+    data: { posts },
+    meta: {
+      count: posts.length,
+      pagesCount,
+      currentPage: page,
+      perPage: take,
+    },
+  });
 });
 
 const getPost = asyncHandler(async (req, res) => {
