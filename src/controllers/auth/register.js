@@ -6,7 +6,6 @@ import asyncHandler from 'express-async-handler';
 import { sendEmailToUser } from '../../config/Nodemailer/nodemailer.js';
 import uuid4 from 'uuid4';
 import cloudinary from 'cloudinary';
-import sanitizeUser from '../../utils/sanitization/sanitizeUser.js';
 
 const prisma = new PrismaClient();
 
@@ -31,11 +30,15 @@ const register = asyncHandler(async (req, res, next) => {
         },
       },
     },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      emailVerified: true,
       profile: {
         select: {
           photo: true,
-          bio: true,
         },
       },
     },
@@ -74,7 +77,6 @@ const register = asyncHandler(async (req, res, next) => {
 
   user.profile.photo = cloudinary.v2.url(user.profile.photo);
   // Remove password and tokens from output
-  sanitizeUser(user);
   res.status(200).json({ status: 'Success', data: { user } });
 });
 

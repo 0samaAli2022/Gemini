@@ -14,7 +14,7 @@ import {
   getUserNotifications,
 } from '../controllers/user/user.index.js';
 import { updateUserValidator } from '../utils/validation/user.validator.js';
-import { uploadSinglePhoto, resizePhotos } from '../config/Multer/multer.js';
+import { uploadSinglePhoto } from '../config/Multer/multer.js';
 import { uploadPhotosCloudinary } from '../config/Cloudinary/cloudinary.js';
 
 const router = express.Router();
@@ -31,8 +31,6 @@ router
     checkUserAuthorization,
     updateUserValidator,
     uploadSinglePhoto,
-    resizePhotos('user'),
-    uploadPhotosCloudinary,
     updateUser
   );
 

@@ -55,4 +55,4 @@ const uploadPhotosCloudinary = asyncHandler(async (req, res, next) => {
   next();
 });
 
-export { uploadPhotosCloudinary };
+export { uploadPhotosCloudinary, uploadImage };

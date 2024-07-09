@@ -13,16 +13,38 @@ const getAllPosts = asyncHandler(async (req, res) => {
   const sort = req.query.sort || 'updatedAt';
   const order = req.query.order || 'desc';
   const orderBy = { [sort]: order };
+  const user = await prisma.user.findUnique({
+    where: { id: req.user.id },
+    select: { following: true },
+  });
+  const followedIds = user.following.map((user) => user.followed_id);
+  let whereCondition = {
+    OR: [
+      {
+        privacy: 'PUBLIC',
+      },
+      {
+        privacy: 'FOLLOWERS',
+        user_id: { in: followedIds },
+      },
+      {
+        privacy: 'PRIVATE',
+        user_id: req.user.id,
+      },
+    ],
+  };
+
+  if (userId) {
+    whereCondition = {
+      AND: [{ author: { id: userId } }, whereCondition],
+    };
+  }
   if (userId !== undefined) {
     const posts = await prisma.post.findMany({
       skip,
       take,
       orderBy,
-      where: {
-        author: {
-          id: userId,
-        },
-      },
+      where: whereCondition,
       include: {
         author: {
           select: {
@@ -53,9 +75,9 @@ const getAllPosts = asyncHandler(async (req, res) => {
       data: { posts },
       meta: {
         count: posts.length,
-        pagesCount: Math.ceil(posts.length / limit),
+        pagesCount: Math.ceil(posts.length / take),
         currentPage: page,
-        perPage: limit,
+        perPage: take,
       },
     });
   } else {
@@ -63,6 +85,7 @@ const getAllPosts = asyncHandler(async (req, res) => {
       skip,
       take,
       orderBy,
+      where: whereCondition,
       include: {
         author: {
           select: {
@@ -93,9 +116,9 @@ const getAllPosts = asyncHandler(async (req, res) => {
       data: { posts },
       meta: {
         count: posts.length,
-        pagesCount: Math.ceil(posts.length / limit),
+        pagesCount: Math.ceil(posts.length / take),
         currentPage: page,
-        perPage: limit,
+        perPage: take,
       },
     });
   }

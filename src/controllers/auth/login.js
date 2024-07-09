@@ -1,16 +1,13 @@
 import { PrismaClient } from '@prisma/client';
 import { comparePassword } from '../../utils/hashingPassword.js';
-import crypto from 'crypto';
 import {
   createAccessToken,
   createRefreshToken,
 } from '../../utils/createToken.js';
 import APIError from '../../utils/APIError.js';
 import asyncHandler from 'express-async-handler';
-import { sendEmailToUser } from '../../config/Nodemailer/nodemailer.js';
 import { redisClient } from '../../config/Redis/redisClient.js';
 import cloudinary from 'cloudinary';
-import sanitizeUser from '../../utils/sanitization/sanitizeUser.js';
 
 const prisma = new PrismaClient();
 
@@ -26,11 +23,15 @@ const login = asyncHandler(async (req, res, next) => {
     where: {
       email,
     },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      emailVerified: true,
       profile: {
         select: {
           photo: true,
-          bio: true,
         },
       },
     },
@@ -66,7 +67,6 @@ const login = asyncHandler(async (req, res, next) => {
   res.cookie('refreshToken', refreshToken, cookieOptions);
   // Remove password and tokens from output
   user.profile.photo = cloudinary.v2.url(user.profile.photo);
-  sanitizeUser(user);
   res
     .status(200)
     .json({ status: 'success', data: { user, token: accessToken } });

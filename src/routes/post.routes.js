@@ -14,27 +14,20 @@ import {
   searchPost,
 } from '../controllers/post/post.index.js';
 import { createPostValidator } from '../utils/validation/post.validator.js';
-import { resizePhotos, uploadMultiPhotos } from '../config/Multer/multer.js';
-import { uploadPhotosCloudinary } from '../config/Cloudinary/cloudinary.js';
+import { uploadMultiPhotos } from '../config/Multer/multer.js';
 
 const router = express.Router();
 
 router
   .route('/')
   .get(authMiddleware, getAllPosts)
-  .post(authMiddleware, createPostValidator, createPost);
+  .post(authMiddleware, uploadMultiPhotos, createPostValidator, createPost);
 router.route('/search').get(searchPost);
 router
   .route('/:id')
   .get(authMiddleware, getPost)
   .delete(authMiddleware, deletePost)
-  .patch(
-    authMiddleware,
-    uploadMultiPhotos,
-    resizePhotos('post'),
-    uploadPhotosCloudinary,
-    updatePost
-  );
+  .patch(authMiddleware, uploadMultiPhotos, updatePost);
 
 router.route('/:id/like').post(authMiddleware, likePost);
 router.route('/:id/dislike').post(authMiddleware, dislikePost);

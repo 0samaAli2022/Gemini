@@ -4,12 +4,11 @@
   "main": "app.js",
   "type": "module",
   "prisma": {
-    "seed": "tsx prisma/seed/seed.ts"
+    "seed": "node prisma/seed.js"
   },
   "scripts": {
     "dev": "nodemon src/app.js",
     "migrate": "prisma migrate dev",
-    "postmigrate": "npx @snaplet/seed sync",
     "prod": "NODE_ENV=prod nodemon src/app.js",
     "debug": "node --inspect src/app.js"
   },
@@ -38,17 +37,10 @@
     "pg": "^8.12.0",
     "redis": "^4.6.14",
     "sharp": "^0.33.4",
-    "streamifier": "^0.1.1",
     "uuid4": "^2.0.3",
     "xss-clean": "^0.1.4"
   },
   "devDependencies": {
-    "@snaplet/copycat": "^5.0.0",
-    "@snaplet/seed": "^0.97.20",
-    "prisma": "^5.16.1",
-    "tsx": "^4.16.2"
-  },
-  "@snaplet/seed": {
-    "config": "prisma/seed/seed.config.ts"
+    "prisma": "^5.16.1"
   }
 }

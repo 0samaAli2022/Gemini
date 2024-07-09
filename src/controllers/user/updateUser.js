@@ -1,31 +1,32 @@
 import asyncHandler from 'express-async-handler';
 import { PrismaClient } from '@prisma/client';
 import cloudinary from 'cloudinary';
-import sanitizeUser from '../../utils/sanitization/sanitizeUser.js';
-
+import { imageConfig } from '../../config/Multer/multer.js';
+import { uploadImage } from '../../config/Cloudinary/cloudinary.js';
 const prisma = new PrismaClient();
 
 const updateUser = asyncHandler(async (req, res, next) => {
-  const { name, role, isActive, bio } = req.body;
-  const user = await prisma.user.findUnique({
-    where: {
-      id: req.user.id,
-    },
-    include: {
-      profile: true,
-    },
-  });
+  const { name, role, bio } = req.body;
+  const user = req.user;
   const dataToUpdate = {
     name: name || user.name,
     role: role || user.role,
-    isActive: isActive || user.isActive,
     profile: {
       update: {
-        photo: req.file ? req.file.filename : user.profile.photo,
         bio: bio || user.profile.bio,
       },
     },
   };
+  if (req.file) {
+    const file = req.file;
+    if (req.user.profile.photo !== 'users/default_user') {
+      await cloudinary.v2.uploader.destroy(user.profile.photo);
+    }
+    file.buffer = await imageConfig(file.buffer);
+    file.filename = `${user.id}-${Date.now()}`;
+    const result = await uploadImage(file.buffer, file.filename, 'users');
+    dataToUpdate.profile.update.photo = result.public_id;
+  }
 
   const updatedUser = await prisma.user.update({
     where: {

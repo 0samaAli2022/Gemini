@@ -1,7 +1,6 @@
 import asyncHandler from 'express-async-handler';
 import { PrismaClient } from '@prisma/client';
-import cloudinary from 'cloudinary';
-import sanitizeUser from '../../utils/sanitization/sanitizeUser.js';
+
 
 const prisma = new PrismaClient();
 
