@@ -70,7 +70,9 @@ const getAllPosts = asyncHandler(async (req, res) => {
     },
   });
 
-  const pagesCount = Math.ceil((await prisma.post.count()) / take);
+  const pagesCount = Math.ceil(
+    (await prisma.post.count({ where: whereCondition })) / take
+  );
   res.status(200).json({
     status: 'success',
     data: { posts },

@@ -13,8 +13,10 @@ const app = express();
 const port = process.env.port || 3000;
 
 appSetup(app);
+app.get('/', (req, res) => {
+  res.send('Hello World!');
+});
 appIndex(app);
-
 const server = app.listen(port, () => {
   console.log(`Server started on port ${port}`);
 });

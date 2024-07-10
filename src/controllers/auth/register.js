@@ -73,7 +73,7 @@ const register = asyncHandler(async (req, res, next) => {
   };
   await sendEmailToUser(info);
 
-  user.profile.photo = cloudinary.v2.url(user.profile.photo);
+  user.profile.photo = process.env.CLOUD_IMG_URL + user.profile.photo;
   // Remove password and tokens from output
   res.status(200).json({ status: 'Success', data: { user } });
 });

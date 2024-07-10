@@ -114,7 +114,7 @@ const seed = async () => {
 
   const users = await prisma.user.findMany();
 
-  for (let i = 0; i < 10000; i++) {
+  for (let i = 0; i < 1000; i++) {
     const randomUserIndex = Math.floor(Math.random() * users.length);
     const randomPrivacyIndex = Math.floor(Math.random() * privacy.length);
     const post = await prisma.post.create({
@@ -129,7 +129,7 @@ const seed = async () => {
     posts.push(post);
   }
 
-  for (let i = 0; i < 100000; i++) {
+  for (let i = 0; i < 10000; i++) {
     const randomUserIndex = Math.floor(Math.random() * users.length);
     const randomPostIndex = Math.floor(Math.random() * posts.length);
     await prisma.comment.create({
