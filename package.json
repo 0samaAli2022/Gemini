@@ -10,10 +10,13 @@
     "node": "20.15"
   },
   "scripts": {
-    "dev": "nodemon src/app.js",
+    "dev": "NODE_ENV=dev nodemon src/app.js",
     "migrate": "prisma migrate dev",
-    "prod": "NODE_ENV=prod nodemon src/app.js",
-    "debug": "node --inspect src/app.js"
+    "prod": "NODE_ENV=prod pm2-runtime start src/app.js -i max",
+    "debug": "node --inspect src/app.js",
+    "docker-dev": "docker compose -f docker-compose.yml up --build",
+    "docker-prod": "docker compose -f docker-compose-prod.yml up --build -d",
+    "docker-stop": "docker compose down -v"
   },
   "author": "",
   "license": "ISC",
@@ -39,6 +42,7 @@
     "nodemailer-mailgun-transport": "^2.1.5",
     "nodemon": "^3.1.4",
     "pg": "^8.12.0",
+    "pm2": "^5.4.2",
     "redis": "^4.6.14",
     "sharp": "^0.33.4",
     "uuid4": "^2.0.3",

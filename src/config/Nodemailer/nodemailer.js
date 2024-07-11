@@ -12,7 +12,7 @@ const transporter = nodeMailer.createTransport(mailgunTransport(auth));
 
 const sendEmailToUser = asyncHandler(async (info) => {
   await transporter.sendMail({
-    from: info.from || `Gemini App <no-reply@gemini.com>`, // sender address
+    from: info.from || `Gemini App <no-reply@sample.com>`, // sender address
     to: info.to, // list of receivers
     subject: info.subject, // Subject line
     text: info.text, // plain text body

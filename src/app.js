@@ -1,7 +1,12 @@
-import 'dotenv/config';
 import express from 'express';
 import appSetup from './utils/appSetup.js';
 import appIndex from './hooks/index.hooks.js';
+import dotenv from 'dotenv';
+
+const env = process.env.NODE_ENV || 'dev';
+console.log(`Environment: ${env}`);
+if (env === 'dev') dotenv.config({ path: '.env.dev' });
+else dotenv.config({ path: '.env' });
 
 // handle uncaught exceptions
 process.on('uncaughtException', (err) => {
@@ -10,13 +15,11 @@ process.on('uncaughtException', (err) => {
 });
 
 const app = express();
-const port = process.env.port || 3000;
+const port = process.env.PORT || 3000;
 
 appSetup(app);
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-});
 appIndex(app);
+
 const server = app.listen(port, () => {
   console.log(`Server started on port ${port}`);
 });

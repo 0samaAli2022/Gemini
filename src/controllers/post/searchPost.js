@@ -33,6 +33,7 @@ const searchPost = asyncHandler(async (req, res) => {
     include: {
       author: {
         select: {
+          
           name: true,
           profile: {
             select: {
