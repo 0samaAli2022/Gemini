@@ -19,7 +19,7 @@ const resetPassword = asyncHandler(async (req, res, next) => {
   });
   if (!user)
     return next(new APIError(`User not find for email: ${email}`, 404));
-  if (!user.passwordResetTokenVerfied)
+  if (!user.passwordResetTokenVerified)
     return next(new APIError(`Not verfied reset token`, 400));
   await prisma.user.update({
     where: {
@@ -28,7 +28,7 @@ const resetPassword = asyncHandler(async (req, res, next) => {
     data: {
       password: await hashPassword(password),
       passwordChangedAt: String(Date.now()),
-      passwordResetTokenVerfied: null,
+      passwordResetTokenVerified: null,
     },
   });
   res

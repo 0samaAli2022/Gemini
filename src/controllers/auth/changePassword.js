@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import asyncHandler from 'express-async-handler';
-import { hashPassword } from '../../utils/hashingPassword.js';
+import APIError from '../../utils/APIError.js';
+import { comparePassword, hashPassword } from '../../utils/hashingPassword.js';
 const prisma = new PrismaClient();
 
 /**
@@ -10,13 +11,15 @@ const prisma = new PrismaClient();
  * @access  public
  */
 const changePassword = asyncHandler(async (req, res, next) => {
-  const { password } = req.body;
-  const user = await prisma.user.update({
+  const { oldPassword, newPassword } = req.body;
+  const matched = await comparePassword(oldPassword, req.user.password);
+  if (!matched) return next(new APIError('Old password is not correct', 400));
+  await prisma.user.update({
     where: {
       id: req.user.id,
     },
     data: {
-      password: await hashPassword(password),
+      password: await hashPassword(newPassword),
     },
   });
   res

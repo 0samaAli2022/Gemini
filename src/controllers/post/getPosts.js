@@ -4,12 +4,13 @@ const prisma = new PrismaClient();
 
 // GET ALL POSTS OR POSTS BY USER
 const getAllPosts = asyncHandler(async (req, res) => {
-  const { userId } = req.query;
-  const page = +req.query.page || 1;
-  const limit = +req.query.limit || 10;
+  const { userId, privacy } = req.query;
+  let page = +req.query.page || 1;
+  page = page < 1 ? 1 : page;
+  let limit = +req.query.limit || 10;
+  limit = limit < 1 ? 10 : limit;
   let skip = (page - 1) * limit;
-  skip = skip < 0 ? 0 : skip;
-  const take = limit < 1 ? 10 : limit;
+  const take = limit;
   const sort = req.query.sort || 'updatedAt';
   const order = req.query.order || 'desc';
   const orderBy = { [sort]: order };
@@ -37,6 +38,11 @@ const getAllPosts = asyncHandler(async (req, res) => {
   if (userId) {
     whereCondition = {
       AND: [{ author: { id: userId } }, whereCondition],
+    };
+  }
+  if (privacy) {
+    whereCondition = {
+      AND: [{ privacy }, whereCondition],
     };
   }
   const posts = await prisma.post.findMany({

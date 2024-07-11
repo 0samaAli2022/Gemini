@@ -63,7 +63,7 @@ const loginValidator = [
 ];
 
 const changePasswordValidator = [
-  check('password')
+  check('newPassword')
     .isLength({
       min: 8,
     })

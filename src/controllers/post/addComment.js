@@ -60,7 +60,7 @@ const addComment = asyncHandler(async (req, res, next) => {
       data: {
         id: uuid4(),
         message: `@${req.user.name} commented on your post: ${post.title}`,
-        user: { connect: { id: post.user_id } },
+        user: { connect: { id: req.user.id } },
         post: { connect: { id } },
       },
     }),

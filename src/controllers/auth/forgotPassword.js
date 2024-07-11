@@ -29,7 +29,6 @@ const forgotPassword = asyncHandler(async (req, res) => {
     },
   });
   const info = {
-    from: `Mailer Company`,
     to: email,
     subject: 'PasswordResetToken',
     text: 'Now you can reset you password.',

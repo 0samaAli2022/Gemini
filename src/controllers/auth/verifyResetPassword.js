@@ -22,7 +22,7 @@ const verifyResetPassword = asyncHandler(async (req, res, next) => {
     data: {
       passwordResetToken: null,
       passwordResetTokenExpire: null,
-      passwordResetTokenVerfied: true,
+      passwordResetTokenVerified: true,
     },
   });
   res.status(200).json({ message: 'Password reset token verified.' });

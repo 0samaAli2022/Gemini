@@ -29,8 +29,10 @@ router
   .delete(authMiddleware, deletePost)
   .patch(authMiddleware, uploadMultiPhotos, updatePost);
 
-router.route('/:id/like').post(authMiddleware, likePost);
-router.route('/:id/dislike').post(authMiddleware, dislikePost);
+router
+  .route('/:id/like')
+  .post(authMiddleware, likePost)
+  .delete(authMiddleware, dislikePost);
 
 router
   .route('/:id/comments')
