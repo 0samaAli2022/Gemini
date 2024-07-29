@@ -31,13 +31,14 @@ const login = asyncHandler(async (req, res, next) => {
       emailVerified: true,
       profile: {
         select: {
+          bio: true,
           photo: true,
         },
       },
     },
   });
   if (!user) {
-    return res.status(401).json({
+    return res.status(400).json({
       message: 'Wrong email or password',
     });
   }
@@ -55,15 +56,14 @@ const login = asyncHandler(async (req, res, next) => {
   }
   const accessToken = await createAccessToken(user.id);
   const refreshToken = await createRefreshToken(user.id);
-
   await redisClient.set(refreshToken, user.id, {
-    EX: process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60, // Set the expiration time to 90 days
+    EX: 30 * 24 * 60 * 60, // Set the expiration time to 90 days
   });
   await redisClient.set(accessToken, user.id, {
-    EX: 24 * 60 * 60, // Set the expiration time to 1 day
+    EX: 15 * 60, // Set the expiration time to 1 min
   });
   const cookieOptions = {
-    maxAge: process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
+    maxAge: 30 * 24 * 60 * 60 * 1000,
     httpOnly: true,
   };
   if (process.env.NODE_ENV === 'prod') cookieOptions.secure = true;

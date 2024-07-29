@@ -31,7 +31,8 @@ const verifyEmail = asyncHandler(async (req, res, next) => {
       isActive: true,
     },
   });
-  res.status(200).json({ status: 'Success', message: 'Email verfied.' });
+  res.redirect(`http://localhost:8000/email-verified`);
+  // res.redirect(`${process.env.FRONTEND_URL}/email-verified`);
 });
 
 export { verifyEmail };

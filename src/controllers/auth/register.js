@@ -16,7 +16,9 @@ const prisma = new PrismaClient();
  * @access  public
  */
 const register = asyncHandler(async (req, res, next) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, confirmPassword } = req.body;
+  if (password !== confirmPassword)
+    return next(new APIError('Passwords do not match', 400));
   const hashedPassword = await hashPassword(password);
   const user = await prisma.user.create({
     data: {

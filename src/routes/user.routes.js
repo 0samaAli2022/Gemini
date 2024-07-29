@@ -12,6 +12,7 @@ import {
   getFollowing,
   searchUser,
   getUserNotifications,
+  checkFollow,
 } from '../controllers/user/user.index.js';
 import { updateUserValidator } from '../utils/validation/user.validator.js';
 import { uploadSinglePhoto } from '../config/Multer/multer.js';
@@ -24,7 +25,7 @@ router.route('/search').get(authMiddleware, searchUser);
 router
   .route('/:id')
   .get(authMiddleware, getUser)
-  .delete(authMiddleware, isAdmin, deleteUser)
+  .delete(authMiddleware, checkUserAuthorization, deleteUser)
   .patch(
     authMiddleware,
     checkUserAuthorization,
@@ -41,6 +42,7 @@ router
 // get followers and following
 router.route('/:id/followers').get(authMiddleware, getFollowers);
 router.route('/:id/following').get(authMiddleware, getFollowing);
+router.route('/:id/isFollowing').get(authMiddleware, checkFollow);
 // get user notification
 router.route('/:id/notifications').get(authMiddleware, getUserNotifications);
 export default router;

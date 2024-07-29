@@ -41,6 +41,7 @@ const updateUser = asyncHandler(async (req, res, next) => {
       emailVerified: true,
       profile: {
         select: {
+          bio: true,
           photo: true,
         },
       },

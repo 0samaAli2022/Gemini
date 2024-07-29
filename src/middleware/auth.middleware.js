@@ -7,19 +7,19 @@ const prisma = new PrismaClient();
 
 const authMiddleware = asyncHandler(async (req, res, next) => {
   const token = req.headers['authorization'];
-  if (!token) return next(new APIError('Authorization header not found', 400));
+  if (!token) return next(new APIError('Unauthorized', 401));
   const encodedToken = token.split(' ')[1];
-  if (!encodedToken) return next(new APIError('Access token is not found', 403));
+  if (!encodedToken) return next(new APIError('Unauthorized', 401));
   const tokenExists = await redisClient.exists(encodedToken);
   if (!tokenExists) {
-    return next(new APIError('Access token is not valid', 403));
+    return next(new APIError('Unauthorized', 401));
   }
   const decodedToken = await verifyAccessToken(encodedToken);
   const user = await prisma.user.findUnique({
     where: { id: decodedToken.id },
     include: { profile: true },
   });
-  if (!user) return next(new APIError('You are not allowed.', 401));
+  if (!user) return next(new APIError('Unauthorized.', 401));
   req.user = user;
   req.token = encodedToken;
   next();

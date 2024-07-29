@@ -30,9 +30,12 @@ const getComments = asyncHandler(async (req, res, next) => {
       post_id: id,
     },
     select: {
+      id: true,
       content: true,
+      createdAt: true,
       author: {
         select: {
+          id: true,
           name: true,
           profile: {
             select: {
@@ -46,6 +49,10 @@ const getComments = asyncHandler(async (req, res, next) => {
   const pagesCount = Math.ceil(
     (await prisma.comment.count({ where: { post_id: id } })) / take
   );
+  comments.forEach((comment) => {
+    comment.author.profile.photo =
+      process.env.CLOUD_IMG_URL + comment.author.profile.photo;
+  });
   res.status(200).json({
     status: 'success',
     data: { comments },

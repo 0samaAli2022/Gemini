@@ -36,19 +36,6 @@ const seed = async () => {
     },
     {
       id: uuid4(),
-      name: 'OsamaBenAli',
-      email: 'osamaali31121999@gmail.com',
-      role: 'USER',
-      password: hashedPassword,
-      emailVerified: true,
-      profile: {
-        create: {
-          id: uuid4(),
-        },
-      },
-    },
-    {
-      id: uuid4(),
       name: 'Monica',
       email: 'monica@gmail.com',
       role: 'USER',

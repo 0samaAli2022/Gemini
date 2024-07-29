@@ -29,7 +29,6 @@ const getAllPosts = asyncHandler(async (req, res) => {
         user_id: { in: followedIds },
       },
       {
-        privacy: 'PRIVATE',
         user_id: req.user.id,
       },
     ],
@@ -53,6 +52,7 @@ const getAllPosts = asyncHandler(async (req, res) => {
     include: {
       author: {
         select: {
+          id: true,
           name: true,
           profile: {
             select: {
@@ -76,6 +76,13 @@ const getAllPosts = asyncHandler(async (req, res) => {
     },
   });
 
+  posts.forEach((post) => {
+    post.images = post.images.map((image) => {
+      return process.env.CLOUD_IMG_URL + image;
+    });
+    post.author.profile.photo =
+      process.env.CLOUD_IMG_URL + post.author.profile.photo;
+  });
   const pagesCount = Math.ceil(
     (await prisma.post.count({ where: whereCondition })) / take
   );

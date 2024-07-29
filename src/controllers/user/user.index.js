@@ -6,3 +6,4 @@ export { getFollowers } from './getFollowers.js';
 export { getFollowing } from './getFollowing.js';
 export { searchUser } from './searchUser.js';
 export { getUserNotifications } from './getUserNotification.js';
+export { checkFollow } from './checkFollow.js';

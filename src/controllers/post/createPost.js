@@ -33,12 +33,16 @@ const createPost = asyncHandler(async (req, res) => {
   const post = await prisma.post.create({
     data: postData,
     include: {
-      author: { select: { name: true, profile: { select: { photo: true } } } },
+      author: {
+        select: { id: true, name: true, profile: { select: { photo: true } } },
+      },
     },
   });
   post.images = post.images.map((image) => {
     return process.env.CLOUD_IMG_URL + image;
-  })
+  });
+  post.author.profile.photo =
+    process.env.CLOUD_IMG_URL + post.author.profile.photo;  
   res.status(200).json({ status: 'success', data: { post } });
 });
 

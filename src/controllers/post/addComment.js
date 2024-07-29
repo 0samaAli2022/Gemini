@@ -33,7 +33,9 @@ const addComment = asyncHandler(async (req, res, next) => {
         },
       },
       select: {
+        id: true,
         content: true,
+        createdAt: true,
         author: {
           select: {
             name: true,
@@ -65,6 +67,7 @@ const addComment = asyncHandler(async (req, res, next) => {
       },
     }),
   ]);
+  comment.author.profile.photo = process.env.CLOUD_IMG_URL + comment.author.profile.photo;
   res.status(200).json({ status: 'success', data: { comment } });
 });
 

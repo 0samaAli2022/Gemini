@@ -22,16 +22,6 @@ const registerValidator = [
       });
       if (exists) throw new Error('Another user is using this email.');
     }),
-    // a third party service to check if the email really exists (25 searches per month free plan)
-    // .custom(async (value) => {
-    //   const response = await fetch(
-    //     `https://api.hunter.io/v2/email-verifier?email=${value}&api_key=${process.env.HUNTER_API_KEY}`
-    //   );
-    //   const data = await response.json();
-    //   console.log(data);
-    //   if (data.data.status === 'invalid')
-    //     throw new Error('Please Enter a valid Email.');
-    // }),
   check('password')
     .isLength({
       min: 8,
@@ -49,15 +39,7 @@ const loginValidator = [
     .notEmpty()
     .withMessage('Email is required.')
     .isEmail()
-    .withMessage('Please Enter a valid Email')
-    .custom(async (value) => {
-      const exists = await prisma.user.findUnique({
-        where: {
-          email: value,
-        },
-      });
-      if (!exists) throw new Error('Wrong email or password.');
-    }),
+    .withMessage('Please Enter a valid Email'),
   check('password').notEmpty().withMessage('Password is required'),
   validationMiddleware,
 ];
